@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Rescisória</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Calculadora do Trabalhador</h1>
+    <form id="rescisaoForm">
+      <div class="form-group">
+        <h2>Verbas Rescisórias</h2>
+        <label for="tipoDemissao">Tipo de Demissão:</label>
+        <select id="tipoDemissao" required>
+          <option value="">Selecione...</option>
+          <option value="sem_justa_causa">Demissão SEM justa causa</option>
+          <option value="com_justa_causa">Demissão COM justa causa</option>
+          <option value="pedido_demissao">Pedido de Demissão</option>
+          <option value="rescisao_reciproca">Rescisão recíproca</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="dataAdmissao">Data de Admissão:</label>
+        <input type="date" id="dataAdmissao" required>
+      </div>
+
+      <div class="form-group">
+        <label for="dataDemissao">Data de Demissão:</label>
+        <input type="date" id="dataDemissao" required>
+      </div>
+
+      <div class="form-group" id="avisoPrevioContainer" style="display: none;">
+        <label for="avisoPrevio">Aviso Prévio:</label>
+        <select id="avisoPrevio">
+          <option value="cumprido">Cumprido</option>
+          <option value="nao_cumprido">Não Cumprido</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="ultimoDiaTrabalhadoContainer" style="display: none;">
+        <label for="ultimoDiaTrabalhado">Data do Último Dia Trabalhado:</label>
+        <input type="date" id="ultimoDiaTrabalhado">
+      </div>
+
+      <div class="form-group">
+        <label for="ultimoSalario">Último Salário (R$):
+          <span class="tooltip-trigger" data-tooltip="O salário a ser considerado deve ser o último e maior salário, considerando ainda os pagamentos de comissões, valores pagos por fora, dentre outras verbas, adicional noturno, periculosidade, insalubridade, etc. Se tiver dúvida, colocar o salário para fins de INSS que é discriminado no contracheque.">*</span>
+        </label>
+        <input type="number" id="ultimoSalario" min="0" step="0.01" required>
+      </div>
+      <div class="form-group" id="feriasVencidasContainer" style="display: none;">
+        <label for="feriasVencidas">Possui Férias Vencidas?</label>
+        <select id="feriasVencidas">
+          <option value="nao">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+        <div id="periodosAquisitivosContainer" style="display: none;">
+          <label for="periodosAquisitivos">Períodos Aquisitivos (separados por vírgula):</label>
+          <input type="text" id="periodosAquisitivos">
+        </div>
+      </div>
+      <div class="form-group" id="saldoFgtsContainer" style="display: none;">
+        <label for="saldoFgts">Saldo do FGTS para fins rescisórios (R$):</label>
+        <input type="number" id="saldoFgts" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <h2>Descontos</h2>
+        <div class="form-group">
+          <label for="adiantamentos">Adiantamentos (R$):</label>
+          <input type="number" id="adiantamentos" min="0" step="0.01" value="0">
+        </div>
+        <div class="form-group">
+          <label for="outrosDescontos">Outros Descontos (R$):</label>
+          <input type="number" id="outrosDescontos" min="0" step="0.01" value="0">
+        </div>
+      </div>
+      <button type="button" onclick="calcularRescisao()">Calcular</button>
+    </form>
+    <div id="loading-overlay" class="loading-overlay" style="display:none">
+      <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <span class="loading-text">Calculando...</span>
+      </div>
+    </div>
+
+    <div id="resultado" style="display:none">
+      <h2>Resultado do Cálculo</h2>
+      <table id="resultadoTabela">
+        <thead>
+          <tr>
+            <th>Verba</th>
+            <th>Valor (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <p id="totalVerbasRescisorias">Total das Verbas Rescisórias: R$ 0,00</p>
+      <p id="totalMultaFgts">Total da Multa do FGTS: R$ 0,00</p>
+      <p id="totalGeral">Total Geral: R$ 0,00</p>
+      <button id="imprimir" onclick="window.print()">Imprimir</button>
+    </div>
+  </div>
+</body>
+
+</html>
