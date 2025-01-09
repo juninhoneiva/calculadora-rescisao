@@ -257,25 +257,54 @@ function calcularVerbasRescisorias(dados) {
     }
   };
   const calcularDecimoTerceiro = () => {
-    let mesesTrabalhados =
-      dataFinalContrato.getMonth() + 1 - (dataAdmissao.getMonth() + 1);
-    if (mesesTrabalhados < 0) {
-      mesesTrabalhados = mesesTrabalhados + 12;
+    let mesesTrabalhados = 0;
+
+    // Verifica se o aviso prévio foi cumprido
+    const avisoPrevioCumprido = avisoPrevio === "cumprido";
+
+    // Data final para considerar no cálculo
+    const dataFinal = new Date(dataFinalContrato); // Data final do contrato (incluindo aviso prévio se cumprido)
+    if (avisoPrevioCumprido) {
+      // Acrescenta um mês ao período de cálculo se o aviso for cumprido
+      dataFinal.setMonth(dataFinal.getMonth() + 1);
     }
-    const diaDemissao = dataFinalContrato.getDate();
-    if (diaDemissao < 15) {
-      mesesTrabalhados = Math.max(0, mesesTrabalhados - 1);
-    }
-    let valorDecimoTerceiro = (ultimoSalario / 12) * mesesTrabalhados;
-    if (
-      tipoDemissao === "sem_justa_causa" ||
-      tipoDemissao === "rescisao_reciproca" ||
-      tipoDemissao === "pedido_demissao"
-    ) {
+
+    // Calcula o 13º proporcional APENAS se a demissão NÃO for com justa causa
+    if (tipoDemissao !== "com_justa_causa") {
+      // Iterar sobre os meses desde a admissão até o final do contrato
+      const dataIteracao = new Date(dataAdmissao);
+      while (
+        dataIteracao.getFullYear() < dataFinal.getFullYear() ||
+        (dataIteracao.getFullYear() === dataFinal.getFullYear() &&
+          dataIteracao.getMonth() <= dataFinal.getMonth())
+      ) {
+        // Verifica se o mês atual deve ser contabilizado
+        if (
+          dataIteracao.getFullYear() < dataFinal.getFullYear() ||
+          (dataIteracao.getFullYear() === dataFinal.getFullYear() &&
+            dataIteracao.getDate() >= 15)
+        ) {
+          mesesTrabalhados++;
+        }
+
+        // Avança para o próximo mês
+        dataIteracao.setMonth(dataIteracao.getMonth() + 1);
+      }
+
+      if (mesesTrabalhados > 13) {
+        mesesTrabalhados = 13; // Limita a 13/12 no máximo (12 meses completos + 1 mês pelo aviso prévio)
+      }
+
+      // Calcula o 13º proporcional
+      const valorDecimoTerceiro = (ultimoSalario / 12) * mesesTrabalhados;
+
+      // Adiciona o 13º proporcional às verbas rescisórias
       verbas.push({
-        verba: "13º Salário Proporcional",
+        verba: `13º Salário Proporcional (${mesesTrabalhados}/12)`,
         valor: valorDecimoTerceiro,
       });
+
+      // Atualiza o total das verbas rescisórias
       totalVerbas += valorDecimoTerceiro;
     }
   };
